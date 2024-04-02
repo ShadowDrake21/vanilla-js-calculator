@@ -1,3 +1,3 @@
-import { formUI } from './modules/calculatorForm.js';
+import { initCalculator } from './modules/calculatorInit.js';
 
-formUI();
+initCalculator();
