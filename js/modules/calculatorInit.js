@@ -1,4 +1,5 @@
 import { buttonTexts } from '../../static/buttons.js';
+import { printValues } from './calculatorPrint.js';
 
 export const initCalculator = () => {
   const calculator = document.querySelector('.calculator');
@@ -12,7 +13,17 @@ export const initCalculator = () => {
 
 const createResultsPart = () => {
   const resultsPart = document.createElement('div');
+  resultsPart.setAttribute('id', 'results');
   resultsPart.classList.add('results');
+
+  const resultsField = document.createElement('p');
+  resultsField.classList.add('resultsField');
+  resultsField.classList.add('poppins-semibold');
+  resultsField.setAttribute('id', 'resultsField');
+
+  // resultsField.innerText = '2+4+6x8-10';
+
+  resultsPart.appendChild(resultsField);
 
   return resultsPart;
 };
@@ -46,6 +57,8 @@ const createFunctionalityPart = () => {
     }
 
     btn.classList.add('poppins-regular');
+
+    btn.addEventListener('click', () => printValues(btn.value));
 
     functionalityPart.appendChild(btn);
   }
