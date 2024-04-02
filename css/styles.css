@@ -1,0 +1,40 @@
+html,
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #89cff0;
+}
+
+.calculator {
+  background-color: #fff;
+  width: 1000px;
+  height: 700px;
+  border: 1px solid #000;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.results {
+  height: 30%;
+}
+
+.functionality {
+  height: 70%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.functionality-btn {
+  width: calc(100% / 10);
+  height: calc(100% / 5);
+}
+
+[data-type='type-46'] {
+  width: calc(200% / 10);
+}
