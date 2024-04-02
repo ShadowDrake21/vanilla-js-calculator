@@ -1,0 +1,19 @@
+{
+  "name": "calculator",
+  "version": "1.0.0",
+  "description": "Portfolio project",
+  "main": "js/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShadowDrake21/vanilla-js-calculator.git"
+  },
+  "author": "Dmytro \"Drake21\" Krapyvianskiy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ShadowDrake21/vanilla-js-calculator/issues"
+  },
+  "homepage": "https://github.com/ShadowDrake21/vanilla-js-calculator#readme"
+}
