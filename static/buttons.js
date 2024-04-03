@@ -18,7 +18,7 @@ export const buttonTexts = [
   '7',
   '8',
   '9',
-  'x',
+  '×',
   '1/x',
   '√x',
   '3√x',
