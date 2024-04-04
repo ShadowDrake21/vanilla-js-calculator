@@ -36,8 +36,8 @@ const createFunctionalityPart = () => {
   const numberButtonIndexes = [16, 17, 18, 26, 27, 28, 36, 37, 38, 46, 48];
 
   let textsCount = 0;
-  for (let i = 0; i < 50; i++) {
-    if (i === 47) {
+  for (let i = 0; i < 40; i++) {
+    if (i === 37) {
       continue;
     }
 

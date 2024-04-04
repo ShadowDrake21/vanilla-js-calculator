@@ -1,11 +1,10 @@
 export const printValues = (value) => {
   const resultField = document.getElementById('results').children[0];
-  const fieldText = resultField.innerHTML;
+  let fieldText = resultField.innerHTML;
 
   const binaryOperators = ['÷', '×', '-', '+', '%'];
   const unaryOperatorsOperatorFirst = [
     '2nd',
-
     'ex',
     '10x',
     '1/x',
@@ -57,6 +56,23 @@ export const printValues = (value) => {
     value.toString() === ')'
   ) {
     resultField.innerHTML += value;
+  } else if (hasOparatorAtEnd(fieldText, [')']) && !isNaN(value)) {
+    return;
+  } else if (
+    parseInt(fieldText.slice(fieldText.length - 1, fieldText.length)) >= 0 &&
+    !isCommaSeparated(fieldText) &&
+    value.toString() === ','
+  ) {
+    console.log(isCommaSeparated(fieldText));
+    resultField.innerHTML += value;
+  } else if (
+    parseInt(fieldText.slice(fieldText.length - 1, fieldText.length)) === 0 &&
+    isNaN(fieldText.slice(fieldText.length - 2, fieldText.length - 1)) &&
+    value !== 0 &&
+    value.toString() !== ','
+  ) {
+    resultField.innerHTML =
+      fieldText.slice(0, resultField.innerHTML.length - 1) + value.toString();
   } else if ((fieldText.length === 0 || !isNaN(fieldText)) && !isNaN(value)) {
     resultField.innerHTML += value;
   } else if (
@@ -105,6 +121,11 @@ export const printValues = (value) => {
     !isNaN(value)
   ) {
     resultField.innerHTML += value;
+  } else if (
+    fieldText.slice(fieldText.length - 1, fieldText.length) === ')' &&
+    binaryOperators.includes(value.toString())
+  ) {
+    resultField.innerHTML += value;
   }
 };
 
@@ -113,10 +134,37 @@ function findInString(substring, array) {
 }
 
 function hasOparatorAtEnd(str, array) {
-  for (let i = 0; i < array; i++) {
-    if (str.endsWith(array)) {
+  for (let i = 0; i < array.length; i++) {
+    if (str.endsWith(array[i])) {
       return true;
     }
   }
   return false;
+}
+
+function countDigitsInLastNumber(string) {
+  const numbers = string.match(/\d+/g);
+  console.log(numbers);
+  if (numbers) {
+    const lastNumber = numbers[numbers.length - 1];
+    return lastNumber.length;
+  } else {
+    return 0;
+  }
+}
+
+function isCommaSeparated(string) {
+  const pattern = /0*\d+(?:,\d+)*/g;
+  let match;
+  let lastNumberIndex = 0;
+
+  while ((match = pattern.exec(string)) !== null) {
+    lastNumberIndex = pattern.lastIndex - match[0].length;
+  }
+
+  const lastNumberMatch = string.match(pattern);
+  const lastNumber = lastNumberMatch[lastNumberMatch.length - 1];
+  const hasComma = lastNumber.includes(',');
+
+  return hasComma;
 }
