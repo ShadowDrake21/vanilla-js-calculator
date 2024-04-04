@@ -33,7 +33,9 @@ const createFunctionalityPart = () => {
   functionalityPart.classList.add('functionality');
 
   const resultBtnIndexes = [9, 19, 29, 39, 49];
-  const numberButtonIndexes = [16, 17, 18, 26, 27, 28, 36, 37, 38, 46, 48];
+  const numberButtonIndexes = [
+    6, 7, 8, 16, 17, 18, 26, 27, 28, 36, 37, 38, 46, 48,
+  ];
 
   let textsCount = 0;
   for (let i = 0; i < 40; i++) {

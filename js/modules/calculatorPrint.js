@@ -4,7 +4,6 @@ export const printValues = (value) => {
 
   const binaryOperators = ['÷', '×', '-', '+', '%'];
   const unaryOperatorsOperatorFirst = [
-    '2nd',
     'ex',
     '10x',
     '1/x',
@@ -16,12 +15,9 @@ export const printValues = (value) => {
     'sin',
     'cos',
     'tan',
-    'sinh',
-    'cosh',
-    'tanh',
   ];
 
-  const unaryOperatorsPower = ['ex', '10x', '2nd'];
+  const unaryOperatorsPower = ['ex', '10x'];
 
   const unaryOperatorsOperatorFirstSymbols = [
     '2^',
@@ -36,9 +32,6 @@ export const printValues = (value) => {
     'sin',
     'cos',
     'tan',
-    'sinh',
-    'cosh',
-    'tanh',
   ];
 
   const unaryOperatorsOperatorSecond = ['x2', 'x3', 'xy', 'x!'];
@@ -49,20 +42,46 @@ export const printValues = (value) => {
         hasOparatorAtEnd(fieldText, binaryOperators))) &&
     value.toString() === '('
   ) {
+    console.log('1');
     resultField.innerHTML += value;
   } else if (
     (fieldText.match(/\(/g) || []).length >
       (fieldText.match(/\)/g) || []).length &&
     value.toString() === ')'
   ) {
-    resultField.innerHTML += value;
+    console.log('2');
+    if (
+      checkBetween(fieldText, '(', fieldText.length, binaryOperators, true) &&
+      !hasOparatorAtEnd(fieldText, binaryOperators)
+    ) {
+      resultField.innerHTML += value;
+    } else {
+      if (
+        checkBetween(
+          fieldText,
+          '(',
+          fieldText.length,
+          binaryOperators,
+          false
+        ) &&
+        !hasOparatorAtEnd(fieldText, binaryOperators)
+      ) {
+        resultField.innerHTML += value;
+      }
+      return;
+    }
   } else if (hasOparatorAtEnd(fieldText, [')']) && !isNaN(value)) {
+    console.log('3');
     return;
+  } else if (value.toString() === 'AC') {
+    console.log('4');
+    resultField.innerHTML = '';
   } else if (
     parseInt(fieldText.slice(fieldText.length - 1, fieldText.length)) >= 0 &&
     !isCommaSeparated(fieldText) &&
     value.toString() === ','
   ) {
+    console.log('5');
     console.log(isCommaSeparated(fieldText));
     resultField.innerHTML += value;
   } else if (
@@ -71,27 +90,58 @@ export const printValues = (value) => {
     value !== 0 &&
     value.toString() !== ','
   ) {
+    console.log('6');
     resultField.innerHTML =
       fieldText.slice(0, resultField.innerHTML.length - 1) + value.toString();
-  } else if ((fieldText.length === 0 || !isNaN(fieldText)) && !isNaN(value)) {
-    resultField.innerHTML += value;
+  } else if (
+    (fieldText.length === 0 || !isNaN(fieldText)) &&
+    (!isNaN(value) || unaryOperatorsOperatorFirst.includes(value))
+  ) {
+    if (unaryOperatorsOperatorFirst.includes(value)) {
+      const strValue = value.toString();
+
+      let operatorPart = strValue;
+      if (unaryOperatorsPower.includes(strValue)) {
+        console.log('7 unaryOperatorsPower');
+        if (strValue.includes('x')) {
+          operatorPart = strValue.slice(0, strValue.length - 1);
+        }
+        operatorPart += '^' + '(';
+      } else if (strValue.includes('x')) {
+        console.log('7 unaryOperatorsPower another');
+        operatorPart = strValue.slice(0, strValue.length - 1) + '(';
+      } else {
+        operatorPart += '(';
+      }
+      console.log('7 unaryOperatorsPower just');
+      resultField.innerHTML += operatorPart;
+    } else {
+      console.log('7 simple');
+      resultField.innerHTML += value;
+    }
   } else if (
     fieldText.length !== 0 &&
     binaryOperators.includes(value.toString()) &&
-    !isNaN(fieldText.slice(fieldText.length - 1, fieldText.length))
+    (!isNaN(fieldText.slice(fieldText.length - 1, fieldText.length)) ||
+      hasOparatorAtEnd(fieldText, ['π', 'e']))
   ) {
+    console.log('8');
+
     resultField.innerHTML += value;
   } else if (
     fieldText.length !== 0 &&
     isNaN(fieldText.slice(fieldText.length - 1, fieldText.length)) &&
-    !isNaN(value)
+    (!isNaN(value) || value.toString() === 'π' || value.toString() === 'e') &&
+    !hasOparatorAtEnd(fieldText, ['π', 'e'])
   ) {
+    console.log('9');
     resultField.innerHTML += value;
   } else if (
     fieldText.length !== 0 &&
     !isNaN(fieldText.slice(fieldText.length - 1, fieldText.length)) &&
     !isNaN(value)
   ) {
+    console.log('10');
     resultField.innerHTML += value;
   } else if (
     fieldText !== 0 &&
@@ -100,31 +150,37 @@ export const printValues = (value) => {
     binaryOperators.includes(
       fieldText.slice(fieldText.length - 1, fieldText.length)
     )
-    //|| (fieldText === 0 && unaryOperators.includes(value.toString()))
   ) {
+    console.log('11');
     const strValue = value.toString();
 
     let operatorPart = strValue;
     if (unaryOperatorsPower.includes(strValue)) {
       if (strValue.includes('x')) {
         operatorPart = strValue.slice(0, strValue.length - 1);
-      } else if (strValue.includes('nd')) {
-        operatorPart = strValue.slice(0, strValue.length - 2);
       }
       operatorPart += '^';
     } else if (strValue.includes('x')) {
       operatorPart = strValue.slice(0, strValue.length - 1);
     }
-    resultField.innerHTML += operatorPart;
+    resultField.innerHTML += operatorPart + '(';
   } else if (
     hasOparatorAtEnd(fieldText, unaryOperatorsOperatorFirstSymbols) &&
     !isNaN(value)
   ) {
+    console.log('12');
     resultField.innerHTML += value;
   } else if (
     fieldText.slice(fieldText.length - 1, fieldText.length) === ')' &&
     binaryOperators.includes(value.toString())
   ) {
+    console.log('13');
+    resultField.innerHTML += value;
+  } else if (
+    (hasOparatorAtEnd(fieldText, binaryOperators) || fieldText.length === 0) &&
+    (value.toString() === 'π' || value.toString() === 'e')
+  ) {
+    console.log('14');
     resultField.innerHTML += value;
   }
 };
@@ -150,6 +206,23 @@ function countDigitsInLastNumber(string) {
     return lastNumber.length;
   } else {
     return 0;
+  }
+}
+
+function checkBetween(str, entryPoint, exitPosition, operators, fullSearch) {
+  const lastOpenEncounter = str.lastIndexOf(entryPoint);
+  const valueBetween = str.slice(lastOpenEncounter + 1, exitPosition);
+  let isThereOperator = false;
+  console.log('valueBetween', valueBetween);
+  if (fullSearch) {
+    for (let i = 0; i < operators.length; i++) {
+      isThereOperator = valueBetween.includes(operators[i]);
+      if (isThereOperator) return true;
+    }
+
+    return false;
+  } else {
+    return valueBetween.length !== 0;
   }
 }
 
