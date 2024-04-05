@@ -4,12 +4,24 @@ export const printValues = (value) => {
 
   const binaryOperators = ['÷', '×', '-', '+', '%'];
   const unaryOperatorsOperatorFirst = [
-    'ex',
-    '10x',
+    'e^x',
+    '10^x',
     '1/x',
     '√x',
     '3√x',
-    'y√x',
+    'ln',
+    'log10',
+    'sin',
+    'cos',
+    'tan',
+    '2^x',
+    '3^x',
+  ];
+
+  const unaryOperatorsOtherThanPowet = [
+    '1/x',
+    '√x',
+    '3√x',
     'ln',
     'log10',
     'sin',
@@ -17,7 +29,7 @@ export const printValues = (value) => {
     'tan',
   ];
 
-  const unaryOperatorsPower = ['ex', '10x'];
+  const unaryOperatorsPower = ['e^x', '10^x', '2^x', '3^x'];
 
   const unaryOperatorsOperatorFirstSymbols = [
     '2^',
@@ -34,21 +46,97 @@ export const printValues = (value) => {
     'tan',
   ];
 
-  const unaryOperatorsOperatorSecond = ['x2', 'x3', 'xy', 'x!'];
+  const unaryOperatorsOperatorSecond = ['x^2', 'x^3', 'x^y', 'x!'];
 
-  if (
-    (fieldText.length === 0 ||
-      (fieldText.length !== 0 &&
-        hasOparatorAtEnd(fieldText, binaryOperators))) &&
-    value.toString() === '('
-  ) {
+  function checkPutOpenBracket() {
+    return (
+      (fieldText.length === 0 ||
+        (fieldText.length !== 0 &&
+          hasOparatorAtEnd(fieldText, binaryOperators))) &&
+      value.toString() === '('
+    );
+  }
+
+  function checkPutCloseBracket() {
+    return (
+      (fieldText.match(/\(/g) || []).length >
+        (fieldText.match(/\)/g) || []).length && value.toString() === ')'
+    );
+  }
+
+  function checkIfPossibleToPutCloseBracket() {
+    return hasOparatorAtEnd(fieldText, [')']) && !isNaN(value);
+  }
+
+  function checkPutComma() {
+    return (
+      parseInt(fieldText.slice(fieldText.length - 1, fieldText.length)) >= 0 &&
+      !isCommaSeparated(fieldText) &&
+      value.toString() === ','
+    );
+  }
+
+  function checkChangeFirstZero() {
+    return (
+      parseInt(fieldText.slice(fieldText.length - 1, fieldText.length)) === 0 &&
+      isNaN(fieldText.slice(fieldText.length - 2, fieldText.length - 1)) &&
+      fieldText.slice(fieldText.length - 2, fieldText.length - 1) !== ',' &&
+      value !== 0 &&
+      value.toString() !== ','
+    );
+  }
+
+  function checkUnaryFunctions1() {
+    return (
+      (fieldText.length === 0 || !isNaN(fieldText)) &&
+      (!isNaN(value) || unaryOperatorsOperatorFirst.includes(value))
+    );
+  }
+
+  function checkAfterPiAndE() {
+    return (
+      fieldText.length !== 0 &&
+      binaryOperators.includes(value.toString()) &&
+      (!isNaN(fieldText.slice(fieldText.length - 1, fieldText.length)) ||
+        hasOparatorAtEnd(fieldText, ['π', 'e']))
+    );
+  }
+
+  function checkUnaryFunctions2() {
+    return (
+      fieldText.length !== 0 &&
+      isNaN(fieldText.slice(fieldText.length - 1, fieldText.length)) &&
+      (!isNaN(value) ||
+        value.toString() === 'π' ||
+        value.toString() === 'e' ||
+        unaryOperatorsOperatorFirst.includes(value.toString())) &&
+      !hasOparatorAtEnd(fieldText, ['π', 'e'])
+    );
+  }
+
+  function checkUnaryFunctions3() {
+    return (
+      fieldText !== 0 &&
+      unaryOperatorsOperatorFirst.includes(value.toString()) &&
+      isNaN(fieldText.slice(fieldText.length - 1, fieldText.length)) &&
+      binaryOperators.includes(
+        fieldText.slice(fieldText.length - 1, fieldText.length)
+      )
+    );
+  }
+
+  function checkWritePiAndE() {
+    return (
+      (hasOparatorAtEnd(fieldText, binaryOperators) ||
+        fieldText.length === 0) &&
+      (value.toString() === 'π' || value.toString() === 'e')
+    );
+  }
+
+  if (checkPutOpenBracket()) {
     console.log('1');
     resultField.innerHTML += value;
-  } else if (
-    (fieldText.match(/\(/g) || []).length >
-      (fieldText.match(/\)/g) || []).length &&
-    value.toString() === ')'
-  ) {
+  } else if (checkPutCloseBracket()) {
     console.log('2');
     if (
       checkBetween(fieldText, '(', fieldText.length, binaryOperators, true) &&
@@ -70,33 +158,21 @@ export const printValues = (value) => {
       }
       return;
     }
-  } else if (hasOparatorAtEnd(fieldText, [')']) && !isNaN(value)) {
+  } else if (checkIfPossibleToPutCloseBracket()) {
     console.log('3');
     return;
   } else if (value.toString() === 'AC') {
     console.log('4');
     resultField.innerHTML = '';
-  } else if (
-    parseInt(fieldText.slice(fieldText.length - 1, fieldText.length)) >= 0 &&
-    !isCommaSeparated(fieldText) &&
-    value.toString() === ','
-  ) {
+  } else if (checkPutComma()) {
     console.log('5');
     console.log(isCommaSeparated(fieldText));
     resultField.innerHTML += value;
-  } else if (
-    parseInt(fieldText.slice(fieldText.length - 1, fieldText.length)) === 0 &&
-    isNaN(fieldText.slice(fieldText.length - 2, fieldText.length - 1)) &&
-    value !== 0 &&
-    value.toString() !== ','
-  ) {
+  } else if (checkChangeFirstZero()) {
     console.log('6');
     resultField.innerHTML =
       fieldText.slice(0, resultField.innerHTML.length - 1) + value.toString();
-  } else if (
-    (fieldText.length === 0 || !isNaN(fieldText)) &&
-    (!isNaN(value) || unaryOperatorsOperatorFirst.includes(value))
-  ) {
+  } else if (checkUnaryFunctions1()) {
     if (unaryOperatorsOperatorFirst.includes(value)) {
       const strValue = value.toString();
 
@@ -106,7 +182,14 @@ export const printValues = (value) => {
         if (strValue.includes('x')) {
           operatorPart = strValue.slice(0, strValue.length - 1);
         }
-        operatorPart += '^' + '(';
+        if (
+          !hasOparatorAtEnd(operatorPart, ['^']) &&
+          !unaryOperatorsOtherThanPowet.includes(value.toString())
+        ) {
+          operatorPart += '^' + '(';
+        } else {
+          operatorPart += '(';
+        }
       } else if (strValue.includes('x')) {
         console.log('7 unaryOperatorsPower another');
         operatorPart = strValue.slice(0, strValue.length - 1) + '(';
@@ -119,23 +202,32 @@ export const printValues = (value) => {
       console.log('7 simple');
       resultField.innerHTML += value;
     }
-  } else if (
-    fieldText.length !== 0 &&
-    binaryOperators.includes(value.toString()) &&
-    (!isNaN(fieldText.slice(fieldText.length - 1, fieldText.length)) ||
-      hasOparatorAtEnd(fieldText, ['π', 'e']))
-  ) {
+  } else if (checkAfterPiAndE()) {
     console.log('8');
 
     resultField.innerHTML += value;
-  } else if (
-    fieldText.length !== 0 &&
-    isNaN(fieldText.slice(fieldText.length - 1, fieldText.length)) &&
-    (!isNaN(value) || value.toString() === 'π' || value.toString() === 'e') &&
-    !hasOparatorAtEnd(fieldText, ['π', 'e'])
-  ) {
+  } else if (checkUnaryFunctions2()) {
     console.log('9');
-    resultField.innerHTML += value;
+    if ([...binaryOperators, '('].includes(fieldText.slice(-1))) {
+      const strValue = value.toString();
+      let operatorPart = strValue;
+      if (unaryOperatorsOperatorFirst.includes(strValue)) {
+        if (strValue.includes('x')) {
+          operatorPart = strValue.slice(0, strValue.length - 1);
+        }
+        if (
+          !hasOparatorAtEnd(operatorPart, ['^']) &&
+          !unaryOperatorsOtherThanPowet.includes(value.toString())
+        ) {
+          operatorPart += '^' + '(';
+        } else {
+          operatorPart += '(';
+        }
+      }
+      resultField.innerHTML += operatorPart;
+    } else {
+      resultField.innerHTML += value.toString();
+    }
   } else if (
     fieldText.length !== 0 &&
     !isNaN(fieldText.slice(fieldText.length - 1, fieldText.length)) &&
@@ -143,14 +235,7 @@ export const printValues = (value) => {
   ) {
     console.log('10');
     resultField.innerHTML += value;
-  } else if (
-    fieldText !== 0 &&
-    unaryOperatorsOperatorFirst.includes(value.toString()) &&
-    isNaN(fieldText.slice(fieldText.length - 1, fieldText.length)) &&
-    binaryOperators.includes(
-      fieldText.slice(fieldText.length - 1, fieldText.length)
-    )
-  ) {
+  } else if (checkUnaryFunctions3()) {
     console.log('11');
     const strValue = value.toString();
 
@@ -176,18 +261,29 @@ export const printValues = (value) => {
   ) {
     console.log('13');
     resultField.innerHTML += value;
-  } else if (
-    (hasOparatorAtEnd(fieldText, binaryOperators) || fieldText.length === 0) &&
-    (value.toString() === 'π' || value.toString() === 'e')
-  ) {
+  } else if (checkWritePiAndE()) {
     console.log('14');
     resultField.innerHTML += value;
+  } else if (unaryOperatorsOperatorSecond.includes(value.toString())) {
+    if (parseInt(fieldText.slice(-1))) {
+      if (value.toString() === 'x^y') {
+        resultField.innerHTML += '^(';
+      } else {
+        console.log(countDigitsInLastNumber(fieldText));
+        const lengthLastNumber = countDigitsInLastNumber(fieldText);
+        const powerPart = fieldText.slice(
+          fieldText.length - lengthLastNumber,
+          fieldText.length
+        );
+        const modifiedPowerPart =
+          '(' + powerPart + value.slice(1, value.length) + ')';
+        resultField.innerHTML =
+          fieldText.slice(0, fieldText.length - lengthLastNumber) +
+          modifiedPowerPart;
+      }
+    }
   }
 };
-
-function findInString(substring, array) {
-  return array.filter((string) => string.includes(substring));
-}
 
 function hasOparatorAtEnd(str, array) {
   for (let i = 0; i < array.length; i++) {

@@ -68,17 +68,16 @@ p {
   border: 1px solid #000;
   height: 100px;
   width: 80%;
-  font-size: 48px;
-  line-height: 54px;
+  font-size: 44px;
+  line-height: 50px;
   display: flex;
   align-items: center;
-  text-wrap: nowrap;
-  overflow-x: auto;
-}
-
-.resultsField {
-  scrollbar-width: thin; /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
+  text-wrap: wrap;
+  overflow-y: auto;
+  word-wrap: break-word;
+  word-break: break-all;
+  scrollbar-width: thin;
+  -ms-overflow-style: none;
 }
 
 .resultsField::-webkit-scrollbar-track {
@@ -87,7 +86,7 @@ p {
 }
 
 .resultsField::-webkit-scrollbar {
-  width: 6px !important;
+  width: 10px !important;
   background-color: transparent;
 }
 
