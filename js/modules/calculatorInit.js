@@ -1,4 +1,5 @@
 import { buttonTexts } from '../../static/buttons.js';
+import { onBackspace, printValues } from './calculatorPrint.js';
 
 export const initCalculator = () => {
   const calculator = document.querySelector('.calculator');
@@ -12,7 +13,17 @@ export const initCalculator = () => {
 
 const createResultsPart = () => {
   const resultsPart = document.createElement('div');
+  resultsPart.setAttribute('id', 'results');
   resultsPart.classList.add('results');
+
+  const resultsField = document.createElement('p');
+  resultsField.classList.add('resultsField');
+  resultsField.classList.add('poppins-semibold');
+  resultsField.setAttribute('id', 'resultsField');
+
+  // resultsField.innerText = '2+4+6x8-10';
+
+  resultsPart.appendChild(resultsField);
 
   return resultsPart;
 };
@@ -22,11 +33,13 @@ const createFunctionalityPart = () => {
   functionalityPart.classList.add('functionality');
 
   const resultBtnIndexes = [9, 19, 29, 39, 49];
-  const numberButtonIndexes = [16, 17, 18, 26, 27, 28, 36, 37, 38, 46, 48];
+  const numberButtonIndexes = [
+    6, 7, 8, 16, 17, 18, 26, 27, 28, 36, 37, 38, 46, 48,
+  ];
 
   let textsCount = 0;
-  for (let i = 0; i < 50; i++) {
-    if (i === 47) {
+  for (let i = 0; i < 40; i++) {
+    if (i === 37) {
       continue;
     }
 
@@ -43,6 +56,13 @@ const createFunctionalityPart = () => {
 
     if (numberButtonIndexes.includes(i)) {
       btn.classList.add('number__btn');
+    }
+
+    if (i === 15) {
+      btn.setAttribute('data-action', 'backspace');
+      btn.addEventListener('click', () => onBackspace());
+    } else {
+      btn.addEventListener('click', () => printValues(btn.value));
     }
 
     btn.classList.add('poppins-regular');
