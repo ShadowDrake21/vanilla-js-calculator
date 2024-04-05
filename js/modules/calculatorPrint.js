@@ -241,3 +241,11 @@ function isCommaSeparated(string) {
 
   return hasComma;
 }
+
+export function onBackspace() {
+  const resultsField = document.querySelector('#resultsField');
+  resultsField.innerHTML = resultsField.innerHTML.slice(
+    0,
+    resultsField.innerHTML.length - 1
+  );
+}

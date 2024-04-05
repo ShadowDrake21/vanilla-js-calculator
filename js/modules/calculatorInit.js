@@ -1,5 +1,5 @@
 import { buttonTexts } from '../../static/buttons.js';
-import { printValues } from './calculatorPrint.js';
+import { onBackspace, printValues } from './calculatorPrint.js';
 
 export const initCalculator = () => {
   const calculator = document.querySelector('.calculator');
@@ -58,9 +58,14 @@ const createFunctionalityPart = () => {
       btn.classList.add('number__btn');
     }
 
-    btn.classList.add('poppins-regular');
+    if (i === 15) {
+      btn.setAttribute('data-action', 'backspace');
+      btn.addEventListener('click', () => onBackspace());
+    } else {
+      btn.addEventListener('click', () => printValues(btn.value));
+    }
 
-    btn.addEventListener('click', () => printValues(btn.value));
+    btn.classList.add('poppins-regular');
 
     functionalityPart.appendChild(btn);
   }
