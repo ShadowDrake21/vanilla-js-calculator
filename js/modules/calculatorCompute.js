@@ -34,29 +34,31 @@ export const compute = () => {
   const expression = expressionEl.innerHTML;
 
   const regex =
-    /(?:\d+\,\d+|\d+|\(|\)|\+|\-|\×|\÷|\^|\/|10\^\(\d+\)|\d+\^2|\d+√\(\d+\)|\d+√\(\d+\)|3√\(\d+\)|\d+!\b|\d+\^3|\d+\^\(\d+\)|\d+\/\(\d+\)|e^\(\d+\)|ln\(\d+\)|log10\(\d+\)|sin\(\d+\)|cos\(\d+\)|tan\(\d+\))/g;
+    /(?:\d+\,\d+|\d+|\(|\)|\+|\-|\×|\÷|\%|\^|\/|10\^\(\d+\)|\d+\^2|\d+√\(\d+\)|\d+√\(\d+\)|3√\(\d+\)|\d+!\b|\d+\^3|\d+\^\(\d+\)|\d+\/\(\d+\)|e^\(\d+\)|ln\(\d+\)|log10\(\d+\)|sin\(\d+\)|cos\(\d+\)|tan\(\d+\)|π|e)/g;
 
   const expressionParts = expression.match(regex);
 
-  const evaluateExpression = () => {
-    let result = decideHowParse(expressionParts, 0);
+  const evaluateExpression = (start, end) => {
+    let result = decideHowParse(expressionParts, start);
 
-    for (let i = 1; i < expressionParts.length - 1; i += 2) {
-      const operator = expressionParts[i];
-      let operand = decideHowParse(expressionParts, i + 1);
+    let idx = start + 1;
+    while (idx < end) {
+      const operator = expressionParts[idx];
+      let operand = decideHowParse(expressionParts, idx + 1);
 
       while (
-        i + 2 < expressionParts.length &&
-        getPrecedence(expressionParts[i + 2]) < getPrecedence(operator)
+        idx + 2 < end &&
+        getPrecedence(expressionParts[idx + 2]) < getPrecedence(operator)
       ) {
-        const nextOperator = expressionParts[i + 2];
-        const nextOperand = decideHowParse(expressionParts, i + 3);
+        const nextOperator = expressionParts[idx + 2];
+        const nextOperand = decideHowParse(expressionParts, idx + 3);
 
         switch (nextOperator) {
           case '+':
             operand += nextOperand;
             break;
           case '-':
+            console.log('substraction', operand, nextOperand);
             operand -= nextOperand;
             break;
           case '×':
@@ -65,9 +67,12 @@ export const compute = () => {
           case '÷':
             operand /= nextOperand;
             break;
+          case '%':
+            operand %= nextOperand;
+            break;
         }
 
-        i += 2;
+        idx += 2;
       }
       switch (operator) {
         case '+':
@@ -82,13 +87,32 @@ export const compute = () => {
         case '÷':
           result /= operand;
           break;
+        case '%':
+          result %= operand;
+          break;
       }
+
+      idx += 2;
     }
     return result;
   };
 
-  let expressionsInParentheses = findExpressionsInParentheses(expression);
-  console.log(evaluateExpression());
+  const evaluateParantheses = (start, end) => {
+    let stack = [];
+    for (let i = start; i < end; i++) {
+      if (expressionParts[i] === '(') {
+        stack.push(i);
+      } else if (expressionParts[i] === ')') {
+        const opndIdx = stack.pop();
+        const result = evaluateExpression(opndIdx + 1, i);
+        expressionParts.splice(opndIdx, i - opndIdx + 1, result.toString());
+        i = opndIdx;
+        end -= i - opndIdx;
+      }
+    }
+    return evaluateExpression(start, end);
+  };
+  console.log(evaluateParantheses(0, expressionParts.length));
 };
 
 function findExpressionsInParentheses(str) {
@@ -125,7 +149,22 @@ function getPrecedence(operator) {
 }
 
 function decideHowParse(array, index) {
-  return array[index].includes(',')
-    ? parseNumberToFloat(array[index])
-    : parseNumberToInt(array[index]);
+  if (array[index]) {
+    if (array[index] === 'π') {
+      return Math.PI;
+    } else if (array[index] === 'e') {
+      return Math.E;
+    } else if (array[index] === 'sin') {
+      return Math.sin(decideHowParse(array, index + 1));
+    } else if (array[index] === 'cos') {
+      return Math.cos(decideHowParse(array, index + 1));
+    } else if (array[index] === 'tan') {
+      return Math.tan(decideHowParse(array, index + 1));
+    } else {
+      return array[index].includes(',')
+        ? parseNumberToFloat(array[index])
+        : parseNumberToInt(array[index]);
+    }
+  }
+  return null;
 }
