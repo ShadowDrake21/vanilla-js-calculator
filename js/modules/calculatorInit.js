@@ -1,6 +1,6 @@
 import { buttonTexts } from '../../static/buttons.js';
 import { onBackspace, printValues } from './calculatorPrint.js';
-
+import { compute } from './calculatorCompute.js';
 export const initCalculator = () => {
   const calculator = document.querySelector('.calculator');
 
@@ -61,6 +61,9 @@ const createFunctionalityPart = () => {
     if (i === 15) {
       btn.setAttribute('data-action', 'backspace');
       btn.addEventListener('click', () => onBackspace());
+    } else if (i === 39) {
+      btn.setAttribute('data-action', 'result');
+      btn.addEventListener('click', () => compute());
     } else {
       btn.addEventListener('click', () => printValues(btn.value));
     }
