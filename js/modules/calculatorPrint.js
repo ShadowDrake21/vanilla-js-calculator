@@ -197,7 +197,7 @@ export const printValues = (value) => {
         operatorPart += '(';
       }
       console.log('7 unaryOperatorsPower just');
-      resultField.innerHTML += operatorPart;
+      resultField.innerHTML += `(${operatorPart}`;
     } else {
       console.log('7 simple');
       resultField.innerHTML += value;
@@ -223,9 +223,11 @@ export const printValues = (value) => {
         } else {
           operatorPart += '(';
         }
+      } else if (parseInt(value)) {
+        operatorPart = strValue;
       }
       resultField.innerHTML += operatorPart;
-    } else {
+    } else if ([...binaryOperators, ','].includes(fieldText.slice(-1))) {
       resultField.innerHTML += value.toString();
     }
   } else if (
