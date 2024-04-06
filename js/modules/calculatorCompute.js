@@ -34,13 +34,46 @@ export const compute = () => {
   const expression = expressionEl.innerHTML;
 
   const regex =
-    /(?:\d+\,\d+|\d+|\(|\)|\+|\-|\×|\÷|\%|\^|\/|10\^\(\d+\)|\d+\^2|\d+√\(\d+\)|\d+√\(\d+\)|3√\(\d+\)|\d+!\b|\d+\^3|\d+\^\(\d+\)|\d+\/\(\d+\)|e^\(\d+\)|ln\(\d+\)|log10\(\d+\)|sin\(\d+\)|cos\(\d+\)|tan\(\d+\)|π|e)/g;
+    /(?:\d+,\d+|\d+\.\d+|\d+|[\(\)\+\-\×\÷\%\^]|10\^\(\d+\)|\d+\^2|\d+√\(\d+\)|3√\(\d+\)|\d+!\b|\d+\^3|\d+\^\(\d+\)|\d+\/\(\d+\)|e\^\(\d+\)|ln\(\d+\)|log10\(\d+\)|(sin|cos|tan)\((?:\d+(\,\d+)?|[^\(\)]+?)\)|sin\(π\)|cos\(π\)|tan\(π\)|sin\(e\)|cos\(e\)|tan\(e\)|sin\(π(?:\/\d+(\,\d+)?)?\)|cos\(π(?:\/\d+(\,\d+)?)?\)|tan\(π(?:\/\d+(\,\d+)?)?\)|π|e)/g;
+
+  // /(?:(?:\d+,\d+|\d+\.\d+|\d+|\(|\)|\+|\-|\×|\÷|\%|\^|\/|10\^\(\d+\)|\d+\^2|\d+√\(\d+\)|\d+√\(\d+\)|3√\(\d+\)|\d+!\b|\d+\^3|\d+\^\(\d+\)|\d+\/\(\d+\)|e^\(\d+\)|ln\(\d+\)|log10\(\d+\)|sin\(\d+(\,\d+)?|\(π\/\d+(\,\d+)?|\(\d+(\,\d+)?\)|\(e\/\d+(\,\d+)?\)|cos\(\d+(\,\d+)?|\(π\/\d+(\,\d+)?|\(\d+(\,\d+)?\)|\(e\/\d+(\,\d+)?\)|tan\(\d+(\,\d+)?|\(π\/\d+(\,\d+)?|\(\d+(\,\d+)?\)|\(e\/\d+(\,\d+)?\)|π|e))/g;
 
   const expressionParts = expression.match(regex);
 
+  console.log('before', expressionParts, expression);
+
+  for (let i = 0; i < expressionParts.length; i++) {
+    if (
+      expressionParts[i].includes('sin') |
+      expressionParts[i].includes('cos') |
+      expressionParts[i].includes('tan')
+    ) {
+      const operator = expressionParts[i].slice(0, 3);
+      let value;
+      if (
+        expressionParts[i].includes('(') &&
+        expressionParts[i].includes(')')
+      ) {
+        value = expressionParts[i].substring(
+          expressionParts[i].indexOf('(') + 1,
+          expressionParts[i].indexOf(')')
+        );
+        console.log('value', value);
+      } else {
+        value = expressionParts[i].slice(4);
+      }
+      console.log('trigonometry', operator, value);
+      expressionParts[i] = operator;
+      expressionParts.splice(i + 1, 1);
+      expressionParts.splice(i + 1, 0, value);
+      i++;
+    }
+    console.log(expressionParts);
+  }
+
   const evaluateExpression = (start, end) => {
     let result = decideHowParse(expressionParts, start);
-
+    console.log('result', start, end);
     let idx = start + 1;
     while (idx < end) {
       const operator = expressionParts[idx];
@@ -90,6 +123,15 @@ export const compute = () => {
         case '%':
           result %= operand;
           break;
+        case 'sin':
+          result = Math.sin(fromDegreesToRadians(operand));
+          break;
+        case 'cos':
+          result = Math.cos(fromDegreesToRadians(operand));
+          break;
+        case 'tan':
+          result = Math.tan(fromDegreesToRadians(operand));
+          break;
       }
 
       idx += 2;
@@ -99,16 +141,20 @@ export const compute = () => {
 
   const evaluateParantheses = (start, end) => {
     let stack = [];
-    for (let i = start; i < end; i++) {
+    let i = start;
+    while (i < end) {
       if (expressionParts[i] === '(') {
         stack.push(i);
       } else if (expressionParts[i] === ')') {
         const opndIdx = stack.pop();
         const result = evaluateExpression(opndIdx + 1, i);
+        console.log();
+        console.log('result', result);
         expressionParts.splice(opndIdx, i - opndIdx + 1, result.toString());
-        i = opndIdx;
         end -= i - opndIdx;
+        i = opndIdx;
       }
+      i++;
     }
     return evaluateExpression(start, end);
   };
@@ -167,4 +213,8 @@ function decideHowParse(array, index) {
     }
   }
   return null;
+}
+
+function fromDegreesToRadians(degress) {
+  return degress * (Math.PI / 180);
 }
