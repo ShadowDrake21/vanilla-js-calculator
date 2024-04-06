@@ -1,10 +1,3 @@
-class SyntaxTreeNode {
-  constructor(value) {
-    this.value = value;
-    this.children = [];
-  }
-}
-
 const precedence = {
   '(': 0,
   ')': 0,
@@ -36,11 +29,7 @@ export const compute = () => {
   const regex =
     /(?:\d+,\d+|\d+\.\d+|\d+|[\(\)\+\-\×\÷\%\^]|10\^\(\d+\)|\d+\^2|\d+√\(\d+\)|3√\(\d+\)|\d+!\b|\d+\^3|\d+\^\(\d+\)|\d+\/\(\d+\)|e\^\(\d+\)|ln\(\d+\)|log10\(\d+\)|(sin|cos|tan)\((?:\d+(\,\d+)?|[^\(\)]+?)\)|sin\(π\)|cos\(π\)|tan\(π\)|sin\(e\)|cos\(e\)|tan\(e\)|sin\(π(?:\/\d+(\,\d+)?)?\)|cos\(π(?:\/\d+(\,\d+)?)?\)|tan\(π(?:\/\d+(\,\d+)?)?\)|π|e)/g;
 
-  // /(?:(?:\d+,\d+|\d+\.\d+|\d+|\(|\)|\+|\-|\×|\÷|\%|\^|\/|10\^\(\d+\)|\d+\^2|\d+√\(\d+\)|\d+√\(\d+\)|3√\(\d+\)|\d+!\b|\d+\^3|\d+\^\(\d+\)|\d+\/\(\d+\)|e^\(\d+\)|ln\(\d+\)|log10\(\d+\)|sin\(\d+(\,\d+)?|\(π\/\d+(\,\d+)?|\(\d+(\,\d+)?\)|\(e\/\d+(\,\d+)?\)|cos\(\d+(\,\d+)?|\(π\/\d+(\,\d+)?|\(\d+(\,\d+)?\)|\(e\/\d+(\,\d+)?\)|tan\(\d+(\,\d+)?|\(π\/\d+(\,\d+)?|\(\d+(\,\d+)?\)|\(e\/\d+(\,\d+)?\)|π|e))/g;
-
   const expressionParts = expression.match(regex);
-
-  console.log('before', expressionParts, expression);
 
   for (let i = 0; i < expressionParts.length; i++) {
     if (
@@ -67,6 +56,8 @@ export const compute = () => {
       expressionParts.splice(i + 1, 1);
       expressionParts.splice(i + 1, 0, value);
       i++;
+    } else if (expressionParts[i] === '^') {
+      expressionParts[i] = '**';
     }
     console.log(expressionParts);
   }
@@ -103,6 +94,9 @@ export const compute = () => {
           case '%':
             operand %= nextOperand;
             break;
+          case '**':
+            operand = Math.pow(operand, nextOperand);
+            break;
         }
 
         idx += 2;
@@ -122,6 +116,9 @@ export const compute = () => {
           break;
         case '%':
           result %= operand;
+          break;
+        case '**':
+          result **= operand;
           break;
         case 'sin':
           result = Math.sin(fromDegreesToRadians(operand));
@@ -158,30 +155,10 @@ export const compute = () => {
     }
     return evaluateExpression(start, end);
   };
-  console.log(evaluateParantheses(0, expressionParts.length));
+  expressionEl.innerHTML = Math.round(
+    evaluateParantheses(0, expressionParts.length)
+  );
 };
-
-function findExpressionsInParentheses(str) {
-  const expressions = [];
-  let start = null;
-  let count = 0;
-
-  for (let i = 0; i < str.length; i++) {
-    if (str[i] === '(') {
-      count++;
-      if (count === 1) {
-        start = i + 1;
-      }
-    } else if (str[i] === ')' && count > 0) {
-      count--;
-      if (count === 0 && start !== null) {
-        expressions.push(str.substring(start, i));
-        start = null;
-      }
-    }
-  }
-  return expressions;
-}
 
 function parseNumberToFloat(string) {
   return parseFloat(string.replace(',', '.'));

@@ -197,7 +197,7 @@ export const printValues = (value) => {
         operatorPart += '(';
       }
       console.log('7 unaryOperatorsPower just');
-      resultField.innerHTML += operatorPart;
+      resultField.innerHTML += `(${operatorPart}`;
     } else {
       console.log('7 simple');
       resultField.innerHTML += value;

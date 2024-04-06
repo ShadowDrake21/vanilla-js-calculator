@@ -36,6 +36,7 @@ const createFunctionalityPart = () => {
   const numberButtonIndexes = [
     6, 7, 8, 16, 17, 18, 26, 27, 28, 36, 37, 38, 46, 48,
   ];
+  const unusedBtnIndexes = [12, 13, 20, 21, 23, 24];
 
   let textsCount = 0;
   for (let i = 0; i < 40; i++) {
@@ -64,6 +65,8 @@ const createFunctionalityPart = () => {
     } else if (i === 39) {
       btn.setAttribute('data-action', 'result');
       btn.addEventListener('click', () => compute());
+    } else if (unusedBtnIndexes.includes(i)) {
+      btn.addEventListener('click', (e) => e.preventDefault());
     } else {
       btn.addEventListener('click', () => printValues(btn.value));
     }
